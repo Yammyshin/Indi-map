@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.root.inmap5.DataActivity">
+ <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+
+     <EditText
+         android:id="@+id/fname"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentTop="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="49dp"
+         android:ems="10"
+         android:hint="First Name"
+         android:inputType="textPersonName" />
+
+     <EditText
+         android:id="@+id/mname"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignStart="@+id/fname"
+         android:layout_below="@+id/fname"
+         android:layout_marginTop="21dp"
+         android:ems="10"
+         android:hint="Middle Name"
+         android:inputType="textPersonName" />
+
+     <EditText
+         android:id="@+id/lname"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignStart="@+id/mname"
+         android:layout_below="@+id/mname"
+         android:layout_marginTop="21dp"
+         android:ems="10"
+         android:hint="Last Name"
+         android:inputType="textPersonName" />
+
+     <EditText
+         android:id="@+id/txt_lat"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignStart="@+id/lname"
+         android:layout_below="@+id/lname"
+         android:layout_marginTop="17dp"
+         android:ems="10"
+         android:enabled="false"
+         android:hint="Latitude"
+         android:inputType="textPersonName" />
+
+     <EditText
+         android:id="@+id/txt_lon"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignStart="@+id/txt_lat"
+         android:layout_below="@+id/txt_lat"
+         android:layout_marginTop="12dp"
+         android:ems="10"
+         android:enabled="false"
+         android:hint="Longitude"
+         android:inputType="textPersonName" />
+
+     <Button
+         android:id="@+id/btnLocate"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/txt_lon"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="34dp"
+         android:text="Save" />
+ </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
