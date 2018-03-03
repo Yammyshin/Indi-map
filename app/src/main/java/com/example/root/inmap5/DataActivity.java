@@ -8,10 +8,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,6 +60,15 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
 
         }
 
+        //check if the location service is enabled
+        //if false display the message and finish the activity to return to the main activity
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            //All location services are disabled
+            Toast.makeText(getApplicationContext(),"Please enable the location service ", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         //request for location updates get the latitude and longitude of the device
         getLocation();
 
@@ -95,9 +107,10 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
 
     }
 
+
     @Override
     public void onProviderDisabled(String s) {
-        Toast.makeText(DataActivity.this, "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+
     }
 
     public class SaveMapInfo extends AsyncTask<String,String,String>

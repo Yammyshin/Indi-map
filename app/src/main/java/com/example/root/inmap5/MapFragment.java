@@ -155,9 +155,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                                 found = true;
                                 break;
                             }
-                            if(!found){
-                                Toast.makeText(getActivity(),"Lastname not found", Toast.LENGTH_SHORT).show();
-                            }
+                        }
+                        if(!found){
+                            Toast.makeText(getActivity(),"Lastname not found", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -229,11 +229,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
         //Disable the zoom button of google map
         mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+        //Disable the default button for location
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
         //Set the max zoom of the map
         mGoogleMap.setMaxZoomPreference(18.0f);
         //Set the minimum zoom of the map
         mGoogleMap.setMinZoomPreference(15.0f);
 
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mGoogleMap.setMyLocationEnabled(true);
+
+            LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+            Location myLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (myLocation == null) {
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+                String provider = lm.getBestProvider(criteria, true);
+                myLocation = lm.getLastKnownLocation(provider);
+            }
+
+            if(myLocation!=null){
+                //Your position in the map
+                latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                        .title("You are Here").icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))).showInfoWindow();
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18.0f));
+
+                listPoints.add(0,latLng);
+            }
+        }
 
         getMarker.connectToDB();
         for(int i=0; i<getMarker.lnamePoints.size(); i++){
@@ -251,22 +278,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         //Add the latitude and longitude so we can move the camera if the search is found in this list
         markerLatLngList.add(latLng);
         }
-
-        //Your position in the map
-        getMarker.getLocation();
-        latLng = new LatLng(getMarker.CURRENT_LATITUDE, getMarker.CURRENT_LONGITUDE);
-        mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                .title("You are Here").icon(BitmapDescriptorFactory
-                        .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))).showInfoWindow();
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18.0f));
-
-        listPoints.add(0,latLng);
-
     }
 
-    private void getMyLocation() {
-
-    }
 
     private String getRequestUrl(LatLng origin, LatLng dest) {
         //Value of origin
