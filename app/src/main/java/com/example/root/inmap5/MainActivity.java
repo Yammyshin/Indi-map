@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     ConnectionClass connectionClass;
 
     String FULLNAME = "";
+    int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
                         while (rs.next())
                         {
+                            id = rs.getInt(1);
                             FULLNAME = rs.getString(2);
                             uname = rs.getString(3);
                             upass = rs.getString(4);
@@ -119,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"" +z, Toast.LENGTH_LONG).show();
                 Intent intent=new Intent(MainActivity.this, Main2Activity.class);
                 intent.putExtra("fullname",FULLNAME);
+                intent.putExtra("user",id);
                 startActivity(intent);
             }else{
                 if(z.equals("") || z == null)

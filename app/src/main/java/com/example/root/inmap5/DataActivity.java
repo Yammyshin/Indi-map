@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class DataActivity extends AppCompatActivity implements LocationListener{
 
@@ -31,6 +33,10 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
     ConnectionClass connectionClass;
     LocationManager locationManager;
 
+
+    Calendar calendar;
+    SimpleDateFormat simpledateformat;
+    String pinDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,12 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
         fname_text = (EditText) findViewById(R.id.fname);
         mname_text = (EditText) findViewById(R.id.mname);
         lname_text = (EditText) findViewById(R.id.lname);
+
+        //Used to get the date and time programmatically
+        //This will determine what date and time the user input the data
+        calendar = Calendar.getInstance();
+        simpledateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        pinDate = simpledateformat.format(calendar.getTime());
 
         connectionClass = new ConnectionClass();
         progressDialog=new ProgressDialog(this);
@@ -121,6 +133,7 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
         String lat = lat_text.getText().toString();
         String lon = lon_text.getText().toString();
 
+
         String z="";
         boolean isSuccess=false;
 
@@ -142,7 +155,8 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
                     if (con == null) {
                         z = "Please check your internet connection";
                     } else {
-                        String query="insert into map_info(fname, mname, lname, lat, lon)values('"+fnamestr+"','"+mnamestr+"','"+lnamestr+"','"+lat+"','"+lon+"')";
+                        String query="insert into map_info(fname, mname, lname, lat, lon, user_id, pin_date)" +
+                                "values('"+fnamestr+"','"+mnamestr+"','"+lnamestr+"','"+lat+"','"+lon+"','"+Main2Activity.USER_ID+"','"+pinDate+"')";
 
                         Statement stmt = con.createStatement();
                         stmt.executeUpdate(query);

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class ConnectionClass {
     String classs = "com.mysql.jdbc.Driver";
 
-    String url = "jdbc:mysql://192.168.1.101/inmap";
+    String url = "jdbc:mysql://192.168.1.100/inmap";
     String un = "inmap_user";
     String password = "_admin_";
 

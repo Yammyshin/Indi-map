@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,6 +18,10 @@ public class GetMarker implements LocationListener{
     public ArrayList<String> lnamePoints;
     public ArrayList<Double> latPoints;
     public ArrayList<Double> lonPoints;
+    public  ArrayList<Integer> user;
+    public ArrayList<String> pinDate;
+    public ArrayList<String> users_Name;
+    public ArrayList<Integer> users_ID;
 
     LocationManager locationManager;
 
@@ -35,6 +40,8 @@ public class GetMarker implements LocationListener{
         lnamePoints = new ArrayList<>();
         latPoints = new ArrayList<>();
         lonPoints = new ArrayList<>();
+        user = new ArrayList<>();
+        pinDate = new ArrayList<>();
 
         String z = "";
         boolean isSuccess=false;
@@ -55,6 +62,8 @@ public class GetMarker implements LocationListener{
                     lnamePoints.add(rs.getString(4));
                     latPoints.add(rs.getDouble(5));
                     lonPoints.add(rs.getDouble(6));
+                    user.add(rs.getInt(7));
+                    pinDate.add(rs.getString(8));
                 }
                 if(lnamePoints.isEmpty())
                     isSuccess = false;
@@ -69,9 +78,42 @@ public class GetMarker implements LocationListener{
 
 
         if(isSuccess) {
-
+            getUsersName();
         }
         return z;
+    }
+
+    private void getUsersName(){
+        connectionClass = new ConnectionClass();
+        users_Name = new ArrayList<>();
+        users_ID = new ArrayList<>();
+
+        String z = "";
+        boolean isSuccess=false;
+        try {
+            Connection con = connectionClass.CONN();
+            if (con == null) {
+                z = "Cannot get users info";
+            } else {
+
+                String query=" select * from users_table";
+
+                Statement stmt = con.createStatement();
+
+                ResultSet rs=stmt.executeQuery(query);
+
+                while (rs.next())
+                {
+                    users_ID.add(rs.getInt(1));
+                   users_Name.add(rs.getString(2));
+                }
+
+            }
+        }catch (Exception ex){
+            isSuccess = false;
+            z = "Exceptions"+ex;
+        }
+
     }
 
     @Override

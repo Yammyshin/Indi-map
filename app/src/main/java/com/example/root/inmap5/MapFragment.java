@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,10 +24,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -196,34 +200,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-//        mGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-//            @Override
-//            public void onInfoWindowClick(Marker marker) {
-//
-//                //Display the FAB because the marker was tapped
-//                fab.show();
-//
-//                //add the markers position to index 1 so so we can create a route from your
-//                //position going to this marker
-//                listPoints.add(1, marker.getPosition());
-//
-////                //check if there is already drawn route if true then remove the old and replace the new route
-////                if (poly_draw == true) {
-////                polyline.remove();
-////                }
-////                    //add the markers position to index 1 so so we can create a route from your
-////                    //position going to this marker
-////                    listPoints.add(1, marker.getPosition());
-////
-////                    String url = getRequestUrl(listPoints.get(0), listPoints.get(1));
-////                    TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-////                    taskRequestDirections.execute(url);
-////
-////                //set the variable to true for us to know that there is already a route drawn in the map
-////                poly_draw = true;
-//            }
-//        });
-
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         //Disable the default button of google map
         mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
@@ -262,12 +238,74 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
             }
         }
 
+        //Used to display all the snippets in a marker
+        //Kay gusto nako ibutang sa new line ang isa ka snippet mao naa ni cxa na code lol(bisaya)
+        mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                LinearLayout info = new LinearLayout(getActivity());
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(getActivity());
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(getActivity());
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
+
         getMarker.connectToDB();
         for(int i=0; i<getMarker.lnamePoints.size(); i++){
             latLng = new LatLng(getMarker.latPoints.get(i), getMarker.lonPoints.get(i));
 
-            Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                    .title(getMarker.lnamePoints.get(i)));
+            String user_pinned = "";
+
+            for(int x=0; x < getMarker.users_Name.size(); x++){
+                if(getMarker.user.get(i) == getMarker.users_ID.get(x)){
+                    user_pinned = getMarker.users_Name.get(x);
+                }
+            }
+
+            //Used to display the date/time of the marker and also who pinned the marker using snippet
+            String snip = "Pinned : " +getMarker.pinDate.get(i) + "\nBy : " +user_pinned;
+
+            Marker marker = null;
+            //Assign the color of the marker based on the users id
+            if(getMarker.user.get(i) == 1){
+                marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        .snippet(snip));
+            }else if(getMarker.user.get(i) == 2){
+                marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                        .snippet(snip));
+            }else if(getMarker.user.get(i) == 3){
+                marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                        .snippet(snip));
+            }else if(getMarker.user.get(i) == 4) {
+                marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                        .snippet(snip));
+            }
 
             //Add the new marker to the list
             markers.add(marker);

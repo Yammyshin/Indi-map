@@ -20,7 +20,8 @@ public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     TextView navFullname;
-    String Fullname;
+    public static String Fullname;
+    public static int USER_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
 
         Fullname = getIntent().getExtras().get("fullname").toString();
+        USER_ID = Integer.parseInt(getIntent().getExtras().get("user").toString());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
