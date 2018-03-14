@@ -60,7 +60,7 @@ public class GetMarker implements LocationListener{
                 z = "Please check your internet connection";
             } else {
 
-                String query=" select * from map_info";
+                String query=" select * from map_info where relocated != 'YES'";
 
                 Statement stmt = con.createStatement();
 
@@ -157,36 +157,28 @@ public class GetMarker implements LocationListener{
         }
     }
 
-
-    public String relocateMarker(String fname, String lname){
+    public boolean relocated = false;
+    public String relocateMarker(Integer id){
 
         String z = "";
-        boolean isSuccess = false;
+       relocated = false;
         try {
             Connection con = connectionClass.CONN();
 
             if (con == null) {
                 z = "Please check your internet connection";
             } else {
-                int id =0;
-                for(int i=0;i<lnamePoints.size();i++) {
-                    if (fname.equals(fnamePoints.get(i)) && lname.equals(lnamePoints.get(i))) {
-                        id = info_id.get(i);
-                        break;
-                    }
-                }
-
                 String query="update map_info SET relocated='YES' where info_id="+id+"";
                 Statement stmt = con.createStatement();
                 stmt.executeUpdate(query);
                 con.close();
                 z = "Information Updated";
-                isSuccess=true;
+                relocated=true;
             }
         }
         catch (Exception ex)
         {
-            isSuccess = false;
+           relocated = false;
             z = "Exceptions"+ex;
         }
         return  z;

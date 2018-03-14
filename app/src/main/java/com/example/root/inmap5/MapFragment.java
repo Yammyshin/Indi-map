@@ -76,6 +76,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     ArrayList<LatLng> markerLatLngList;
     List<Marker> markers = new ArrayList<Marker>();
 
+    private HashMap<Marker, Integer> mHashMap = new HashMap<Marker, Integer>();
+
     public GetMarker getMarker;
     public LatLng latLng;
 
@@ -196,6 +198,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                     fab.show();
                 }
 
+                final int info_id = mHashMap.get(marker);
+
                 String user_pinned = "";
                 String pinDate = "";
                 for(int i=0; i<getMarker.lnamePoints.size(); i++) {
@@ -225,8 +229,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                         "Relocate",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                String res = getMarker.relocateMarker(parts[1], parts[0]);
+                                String res = getMarker.relocateMarker(info_id);
                                 Toast.makeText(getActivity(),res,Toast.LENGTH_LONG).show();
+                                if(getMarker.relocated){
+                                  marker.remove();
+                                }
                                 dialog.cancel();
                             }
                         });
@@ -342,6 +349,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         markerList.add(i,getMarker.lnamePoints.get(i));
         //Add the latitude and longitude so we can move the camera if the search is found in this list
         markerLatLngList.add(latLng);
+        //this will hold the primary
+        mHashMap.put(marker, getMarker.info_id.get(i));
         }
     }
 
