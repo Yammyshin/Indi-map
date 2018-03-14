@@ -155,8 +155,8 @@ public class DataActivity extends AppCompatActivity implements LocationListener{
                     if (con == null) {
                         z = "Please check your internet connection";
                     } else {
-                        String query="insert into map_info(fname, mname, lname, lat, lon, user_id, pin_date)" +
-                                "values('"+fnamestr+"','"+mnamestr+"','"+lnamestr+"','"+lat+"','"+lon+"','"+Main2Activity.USER_ID+"','"+pinDate+"')";
+                        String query="insert into map_info(fname, mname, lname, lat, lon, user_id, pin_date, relocated)" +
+                                "values('"+fnamestr+"','"+mnamestr+"','"+lnamestr+"','"+lat+"','"+lon+"','"+Main2Activity.USER_ID+"','"+pinDate+"','"+"NO"+"')";
 
                         Statement stmt = con.createStatement();
                         stmt.executeUpdate(query);

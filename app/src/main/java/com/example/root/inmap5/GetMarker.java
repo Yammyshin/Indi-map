@@ -1,11 +1,16 @@
 package com.example.root.inmap5;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.Marker;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,6 +20,8 @@ import java.util.ArrayList;
 public class GetMarker implements LocationListener{
 
     public ConnectionClass connectionClass;
+    public ArrayList<Integer> info_id;
+    public ArrayList<String> fnamePoints;
     public ArrayList<String> lnamePoints;
     public ArrayList<Double> latPoints;
     public ArrayList<Double> lonPoints;
@@ -22,6 +29,7 @@ public class GetMarker implements LocationListener{
     public ArrayList<String> pinDate;
     public ArrayList<String> users_Name;
     public ArrayList<Integer> users_ID;
+
 
     LocationManager locationManager;
 
@@ -36,7 +44,8 @@ public class GetMarker implements LocationListener{
     public String connectToDB(){
 
         connectionClass = new ConnectionClass();
-
+        info_id = new ArrayList<>();
+        fnamePoints = new ArrayList<>();
         lnamePoints = new ArrayList<>();
         latPoints = new ArrayList<>();
         lonPoints = new ArrayList<>();
@@ -59,6 +68,8 @@ public class GetMarker implements LocationListener{
 
                 while (rs.next())
                 {
+                    info_id.add(rs.getInt(1));
+                    fnamePoints.add(rs.getString(2));
                     lnamePoints.add(rs.getString(4));
                     latPoints.add(rs.getDouble(5));
                     lonPoints.add(rs.getDouble(6));
@@ -146,6 +157,41 @@ public class GetMarker implements LocationListener{
         }
     }
 
-    //Location is off the map so make sure it is accurate
-    //Don't display the map until the current location is acquired by the application
+
+    public String relocateMarker(String fname, String lname){
+
+        String z = "";
+        boolean isSuccess = false;
+        try {
+            Connection con = connectionClass.CONN();
+
+            if (con == null) {
+                z = "Please check your internet connection";
+            } else {
+                int id =0;
+                for(int i=0;i<lnamePoints.size();i++) {
+                    if (fname.equals(fnamePoints.get(i)) && lname.equals(lnamePoints.get(i))) {
+                        id = info_id.get(i);
+                        break;
+                    }
+                }
+
+                String query="update map_info SET relocated='YES' where info_id="+id+"";
+                Statement stmt = con.createStatement();
+                stmt.executeUpdate(query);
+                con.close();
+                z = "Information Updated";
+                isSuccess=true;
+            }
+        }
+        catch (Exception ex)
+        {
+            isSuccess = false;
+            z = "Exceptions"+ex;
+        }
+        return  z;
+    }
+
 }
+
+

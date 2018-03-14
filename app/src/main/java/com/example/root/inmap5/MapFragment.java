@@ -55,6 +55,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +86,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     String search = "";
 
     public ProgressDialog progressDialog;
-   // public ConnectionClass connectionClass;
+    public ConnectionClass connectionClass;
 
     @Nullable
     @Override
@@ -189,10 +191,49 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
 
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public boolean onMarkerClick(final Marker marker) {
                 if(fab.getVisibility() != fab.VISIBLE){
                     fab.show();
                 }
+
+                String user_pinned = "";
+                String pinDate = "";
+                for(int i=0; i<getMarker.lnamePoints.size(); i++) {
+                    for (int x = 0; x < getMarker.users_Name.size(); x++) {
+                        if (getMarker.user.get(i) == getMarker.users_ID.get(x)) {
+                            user_pinned = getMarker.users_Name.get(x);
+                        }
+                    }pinDate = getMarker.pinDate.get(i);
+                }
+
+                String full = marker.getTitle();
+                final String[] parts = full.split(",");
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+                builder1.setMessage(marker.getTitle() + "\nPinned : " + pinDate + "\nBy : " + user_pinned);
+                builder1.setCancelable(true);
+
+                builder1.setPositiveButton(
+                        "Close",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                builder1.setNegativeButton(
+                        "Relocate",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String res = getMarker.relocateMarker(parts[1], parts[0]);
+                                Toast.makeText(getActivity(),res,Toast.LENGTH_LONG).show();
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+
                 //add the markers position to index 1 so so we can create a route from your
                 //position going to this marker
                 listPoints.add(1, marker.getPosition());
@@ -240,71 +281,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
 
         //Used to display all the snippets in a marker
         //Kay gusto nako ibutang sa new line ang isa ka snippet mao naa ni cxa na code lol(bisaya)
-        mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(Marker marker) {
-                LinearLayout info = new LinearLayout(getActivity());
-                info.setOrientation(LinearLayout.VERTICAL);
-
-                TextView title = new TextView(getActivity());
-                title.setTextColor(Color.BLACK);
-                title.setGravity(Gravity.CENTER);
-                title.setTypeface(null, Typeface.BOLD);
-                title.setText(marker.getTitle());
-
-                TextView snippet = new TextView(getActivity());
-                snippet.setTextColor(Color.GRAY);
-                snippet.setText(marker.getSnippet());
-
-                info.addView(title);
-                info.addView(snippet);
-
-                return info;
-            }
-        });
+//        mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+//            @Override
+//            public View getInfoWindow(Marker marker) {
+//                return null;
+//            }
+//
+//            @Override
+//            public View getInfoContents(Marker marker) {
+//                LinearLayout info = new LinearLayout(getActivity());
+//                info.setOrientation(LinearLayout.VERTICAL);
+//
+//                TextView title = new TextView(getActivity());
+//                title.setTextColor(Color.BLACK);
+//                title.setGravity(Gravity.CENTER);
+//                title.setTypeface(null, Typeface.BOLD);
+//                title.setText(marker.getTitle());
+//
+//                TextView snippet = new TextView(getActivity());
+//                snippet.setTextColor(Color.GRAY);
+//                snippet.setText(marker.getSnippet());
+//
+//                info.addView(title);
+//                info.addView(snippet);
+//
+//                return info;
+//            }
+//        });
 
         getMarker.connectToDB();
         for(int i=0; i<getMarker.lnamePoints.size(); i++){
             latLng = new LatLng(getMarker.latPoints.get(i), getMarker.lonPoints.get(i));
 
-            String user_pinned = "";
-
-            for(int x=0; x < getMarker.users_Name.size(); x++){
-                if(getMarker.user.get(i) == getMarker.users_ID.get(x)){
-                    user_pinned = getMarker.users_Name.get(x);
-                }
-            }
-
-            //Used to display the date/time of the marker and also who pinned the marker using snippet
-            String snip = "Pinned : " +getMarker.pinDate.get(i) + "\nBy : " +user_pinned;
-
+            String fullname = getMarker.lnamePoints.get(i) + ", " + getMarker.fnamePoints.get(i);
             Marker marker = null;
             //Assign the color of the marker based on the users id
             if(getMarker.user.get(i) == 1){
                 marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                        .snippet(snip));
+                        .title(fullname).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
             }else if(getMarker.user.get(i) == 2){
                 marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                        .snippet(snip));
+                        .title(fullname).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
             }else if(getMarker.user.get(i) == 3){
                 marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                        .snippet(snip));
+                        .title(fullname).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
             }else if(getMarker.user.get(i) == 4) {
                 marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(getMarker.lnamePoints.get(i)).icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-                        .snippet(snip));
+                        .title(fullname).icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
             }
 
             //Add the new marker to the list
